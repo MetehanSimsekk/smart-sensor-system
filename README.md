@@ -22,13 +22,13 @@ IoT sensörlerinden MQTT protokolü ile veri toplayan, gerçek zamanlı yayınla
 - Node.js 22+
 - Git
 
-### 1. Repoyu klonla
+### 1. Repoyu klonlayın
 ```bash
 git clone https://github.com/MetehanSimsekk/smart-sensor-system.git
 cd smart-sensor-system
 ```
 
-### 2. Environment dosyasını oluştur
+### 2. Environment dosyasını oluşturun
 ```bash
 cp .env.example backend/.env
 ```
@@ -39,21 +39,21 @@ cp .env.example backend/.env
 docker compose up --build
 ```
 
-### 4. Seed verilerini yükle
+### 4. Seed verilerini yükleyin
 ```bash
 cd backend
 npm run seed
 ```
 > Veritabanına test kullanıcıları ve örnek şirket verisi oluşturur. İlk kurulumda bir kez çalıştırmanız yeterlidir.
 
-### 5. Frontend'i başlat
+### 5. Frontend'i başlatın
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 6. Tarayıcıda aç
+### 6. Tarayıcıda açınız
 ```
 http://localhost:5173
 ```
@@ -68,7 +68,7 @@ http://localhost:5173
 
 
 
-### Simülatör ile test 
+### Simülatör ile test isterseniz
 ```bash
 npm run simulate:docker
 ```
@@ -80,13 +80,13 @@ API'ler DDoS koruması için rate limiting ile korunmaktadır:
 - Limit aşılırsa `429 Too Many Requests` döner
 
 ### MQTT TLS/SSL
-MQTT broker TLS/SSL ile korunmaktadır. Port 8883 üzerinden şifreli bağlantı kurulmaktadır. Self-signed sertifikalar `mosquitto/certs/` klasöründe bulunmaktadır.
-```
+MQTT broker TLS/SSL ile korunmaktadır.Port 8883 üzerinden şifreli bağlantı kurulmaktadır.Self-signed sertifikalar `mosquitto/certs/` klasöründe bulunmaktadır.
+
 
 ### JWT Authentication
 Tüm API endpoint'leri JWT token ile korunmaktadır. Token süresi 7 gündür.
 
-### Mosquitto CLI ile tek mesaj
+### Mosquitto CLI ile tek mesaj göndermek isterseniz : 
 ```bash
 docker exec -it sensor_mosquitto mosquitto_pub \
 -h localhost -p 8883 \
@@ -136,13 +136,6 @@ docker exec -it sensor_mosquitto mosquitto_pub \
 | POST | /api/logs | Log oluştur | JWT |
 | GET | /api/logs/analytics | Log analitikleri | Admin |
 
-
-##  Testleri Çalıştır
-```bash
-cd backend
-npm test
-```
-
 ## Docker Servisleri
 
 | Servis | Port | Açıklama |
@@ -152,3 +145,9 @@ npm test
 | InfluxDB | 8086 | Zaman serisi DB |
 | Mosquitto | 1883 | MQTT Broker |
 | Frontend | 5173 | React UI |
+
+##  Testleri Çalıştırın
+```bash
+cd backend
+npm test
+```
