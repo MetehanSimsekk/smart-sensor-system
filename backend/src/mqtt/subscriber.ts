@@ -46,7 +46,7 @@ const validateSensorData = (data: any): data is SensorData => {
 };
 
 const tlsOptions = process.env.MQTT_BROKER_URL?.startsWith('mqtts') ? {
-  ca: fs.readFileSync(process.env.MQTT_CA_CERT || '/mosquitto/certs/ca.crt')
+  rejectUnauthorized: false
 } : {};
 
 export const connectMQTT = (io: Server): MqttClient => {

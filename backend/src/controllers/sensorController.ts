@@ -105,3 +105,39 @@ export const getUserSensors = async (req: AuthRequest, res: Response): Promise<v
     res.status(500).json({ error: 'Sunucu hatası.' });
   }
 };
+
+export const simulateSensorData = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { sensorId, temperature, humidity } = req.body;
+    
+    // Validate required fields
+    if (!sensorId || typeof temperature !== 'number' || typeof humidity !== 'number') {
+      res.status(400).json({ error: 'Geçersiz sensör verisi.' });
+      return;
+    }
+
+    // Check if sensor exists
+    const sensor = await Sensor.findOne({ where: { sensorId } });
+    if (!sensor) {
+      res.status(404).json({ error: 'Sensör bulunamadı.' });
+      return;
+    }
+
+    // Create sensor data in required format
+    const sensorData = {
+      sensor_id: sensorId,
+      timestamp: Math.floor(Date.now() / 1000),
+      temperature,
+      humidity
+    };
+
+    // Here you would typically publish to MQTT
+    // For simulation, we'll just return success
+    res.json({ 
+      message: 'Sensör verisi başarıyla simüle edildi.',
+      data: sensorData 
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Sunucu hatası.' });
+  }
+};
