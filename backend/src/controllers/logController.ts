@@ -100,7 +100,7 @@ export const getLogAnalytics = async (req: AuthRequest, res: Response): Promise<
       .slice(0, 5)
       .map(([userId, count]) => ({ 
         userId, 
-        userName: userMap[userId] || 'Bilinmeyen Kullanıcı', 
+        userName: userMap[userId] || 'Silinen Kullanıcı', 
         count 
       }));
 

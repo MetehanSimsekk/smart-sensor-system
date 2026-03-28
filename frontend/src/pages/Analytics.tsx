@@ -158,7 +158,7 @@ export default function Analytics() {
         </ResponsiveContainer>
       </div>
 
-      {/* En aktif kullanıcılar */}
+   
       <div style={{ background: colors.bgCard, border: `1px solid ${colors.border}`, borderRadius: '16px', padding: '1.5rem' }}>
         <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, marginBottom: '1.25rem' }}>En Aktif Kullanıcılar</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

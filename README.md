@@ -70,8 +70,8 @@ http://localhost:5173
 | Rol | Email | Şifre |
 |-----|-------|-------|
 | System Admin | admin@patrion.com | Patrion2026 |
-| Company Admin | company@patrion.com | Patrion2026 |
-| User | user@patrion.com | Patrion2026 |
+| Company Admin | company@patrion.com | 1234 |
+| User | user@patrion.com | 1234 |
 
 
 
