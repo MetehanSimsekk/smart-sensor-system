@@ -2,6 +2,15 @@
 
 IoT sensörlerinden MQTT protokolü ile veri toplayan, gerçek zamanlı yayınlayan ve kullanıcı davranışlarını analiz eden bir backend servisi ve UI.
 
+
+
+![Dashboard](docs/images/SS1.png)
+![Dashboard](docs/images/SS2.png)
+![Dashboard](docs/images/SS3.png)
+![Dashboard](docs/images/SS4.png)
+
+
+
 ## Teknoloji Stack
 
 | Katman | Teknoloji |
