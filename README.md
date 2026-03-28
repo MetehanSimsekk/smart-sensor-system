@@ -48,8 +48,7 @@ docker compose up --build
 
 ### 4. Seed verilerini yükleyin
 ```bash
-cd backend
-npm run seed
+docker exec sensor_backend npm run seed
 ```
 > Veritabanına test kullanıcıları ve örnek şirket verisi oluşturur. İlk kurulumda bir kez çalıştırmanız yeterlidir.
 
