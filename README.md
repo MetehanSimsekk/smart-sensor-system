@@ -151,3 +151,10 @@ docker exec -it sensor_mosquitto mosquitto_pub \
 cd backend
 npm test
 ```
+## 🌐 Demo
+
+| Servis | URL |
+|--------|-----|
+| Health Check | https://smart-sensor-system.onrender.com/health |
+
+> Tam sistem testi için `docker compose up` kullanınız.
