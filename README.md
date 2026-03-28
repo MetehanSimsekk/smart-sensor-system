@@ -104,6 +104,12 @@ docker exec -it sensor_mosquitto mosquitto_pub \
 
 ## API Endpoints
 
+> **Yetki Seviyeleri:**
+> - `Public` → Token gerekmez
+> - `JWT` → Giriş yapmış tüm kullanıcılar
+> - `Admin` → System Admin + Company Admin
+> - `System Admin` → Sadece System Admin
+
 ### Auth
 | Method | Endpoint | Açıklama | Auth |
 |--------|----------|----------|------|
