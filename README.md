@@ -4,12 +4,10 @@ IoT sensörlerinden MQTT protokolü ile veri toplayan, gerçek zamanlı yayınla
 
 
 
-![Dashboard](docs/images/SS1.png)
-![Dashboard](docs/images/SS2.png)
-![Dashboard](docs/images/SS3.png)
+
 ![Dashboard](docs/images/SS4.png)
 
-
+![Dashboard](docs/images/SS3.png)
 
 ## Teknoloji Stack
 
