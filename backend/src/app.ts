@@ -20,7 +20,7 @@ import './models/associations';
 
 dotenv.config();
 
-const app: Application = express();
+export const app: Application = express();
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
@@ -88,9 +88,13 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, async () => {
-  await connectDB();
-  connectMQTT(io);
-  console.log(`🚀 Server çalışıyor: http://localhost:${PORT}`);
-  console.log(`🌍 Ortam: ${process.env.NODE_ENV || 'development'}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  httpServer.listen(PORT, async () => {
+    await connectDB();
+    connectMQTT(io);
+    console.log(`🚀 Server çalışıyor: http://localhost:${PORT}`);
+    console.log(`🌍 Ortam: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
+
+export {  io };

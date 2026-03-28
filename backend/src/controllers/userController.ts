@@ -10,7 +10,6 @@ export const getUsers = async (req: AuthRequest, res: Response): Promise<void> =
       where.companyId = req.user.companyId;
     }
 
-    // System admin hiçbir zaman listelenmez
     const users = await User.findAll({
       where,
       attributes: { exclude: ['password', 'apiKey'] }
