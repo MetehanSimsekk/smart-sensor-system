@@ -2,6 +2,7 @@ import mqtt, { MqttClient } from 'mqtt';
 import { InfluxDB, Point } from '@influxdata/influxdb-client';
 import { Server } from 'socket.io';
 import winston from 'winston';
+import fs from 'fs';
 
 // Logger
 const logger = winston.createLogger({
@@ -44,12 +45,17 @@ const validateSensorData = (data: any): data is SensorData => {
   );
 };
 
+const tlsOptions = process.env.MQTT_BROKER_URL?.startsWith('mqtts') ? {
+  ca: fs.readFileSync(process.env.MQTT_CA_CERT || '/mosquitto/certs/ca.crt')
+} : {};
+
 export const connectMQTT = (io: Server): MqttClient => {
-  const client = mqtt.connect(process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883', {
+ const client = mqtt.connect(process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883', {
     username: process.env.MQTT_USERNAME,
     password: process.env.MQTT_PASSWORD,
     reconnectPeriod: 5000,
-    connectTimeout: 30000
+    connectTimeout: 30000,
+    ...tlsOptions
   });
 
   client.on('connect', () => {

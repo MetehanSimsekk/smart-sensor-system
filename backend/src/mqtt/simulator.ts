@@ -1,9 +1,12 @@
 import mqtt from 'mqtt';
 import dotenv from 'dotenv';
-
+import fs from 'fs';
+import path from 'path';
 dotenv.config();
 
-const client = mqtt.connect(process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883');
+const client = mqtt.connect(process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883', {
+  rejectUnauthorized: false
+});
 
 const sensors = [
   'temp_sensor_01',

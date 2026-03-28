@@ -74,10 +74,23 @@ npm run simulate:docker
 ```
 > 3 farklı sensörden (temp_sensor_01, temp_sensor_02, temp_sensor_03) her 3 saniyede bir rastgele sıcaklık ve nem verisi üretir. Dashboard'da gerçek zamanlı grafik canlanır.
 
+### Rate Limiting
+API'ler DDoS koruması için rate limiting ile korunmaktadır:
+- 15 dakikada maksimum 100 istek
+- Limit aşılırsa `429 Too Many Requests` döner
+
+### MQTT TLS/SSL
+MQTT broker TLS/SSL ile korunmaktadır. Port 8883 üzerinden şifreli bağlantı kurulmaktadır. Self-signed sertifikalar `mosquitto/certs/` klasöründe bulunmaktadır.
+```
+
+### JWT Authentication
+Tüm API endpoint'leri JWT token ile korunmaktadır. Token süresi 7 gündür.
+
 ### Mosquitto CLI ile tek mesaj
 ```bash
 docker exec -it sensor_mosquitto mosquitto_pub \
-  -h localhost \
+-h localhost -p 8883 \
+
   -t sensors/temp_sensor_01 \
   -m '{"sensor_id":"temp_sensor_01","timestamp":1710772800,"temperature":25.4,"humidity":55.2}'
 ```
@@ -95,9 +108,9 @@ docker exec -it sensor_mosquitto mosquitto_pub \
 ### Sensörler
 | Method | Endpoint | Açıklama | Auth |
 |--------|----------|----------|------|
-| GET | /api/sensors | Sensörleri listele 
+| GET | /api/sensors | Sensörleri listele | JWT |
 | POST | /api/sensors | Sensör ekle | Admin |
-| GET | /api/sensors/:id/data | Sensör verisi 
+| GET | /api/sensors/:id/data | Sensör verisi | JWT |
 | DELETE | /api/sensors/:id | Sensör sil | System Admin |
 
 ### Kullanıcılar
@@ -119,8 +132,8 @@ docker exec -it sensor_mosquitto mosquitto_pub \
 ### Loglar
 | Method | Endpoint | Açıklama | Auth |
 |--------|----------|----------|------|
-| GET | /api/logs | Logları listele | 
-| POST | /api/logs | Log oluştur 
+| GET | /api/logs | Logları listele | JWT |
+| POST | /api/logs | Log oluştur | JWT |
 | GET | /api/logs/analytics | Log analitikleri | Admin |
 
 
