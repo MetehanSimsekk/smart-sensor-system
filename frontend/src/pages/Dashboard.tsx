@@ -7,6 +7,8 @@ import Users from './Users';
 import Customers from './Customers';
 import Toast from '../components/Toast';
 import Analytics from './Analytics';
+import SensorControl from '../components/SensorControl';
+import sensorSimulation from '../services/sensorSimulation';
 
 const colors = {
   bg: 'rgba(32, 30, 38, 1)',
@@ -50,19 +52,40 @@ const StatCard = ({ title, value, unit, color, icon }: any) => (
 export default function Dashboard() {
   const { sensorData, connected } = useSocket();
   const [sensors, setSensors] = useState<any[]>([]);
-const [logs, setLogs] = useState<any[]>([]);
-const [activeTab, setActiveTab] = useState<'dashboard' | 'sensors' | 'users' | 'logs' | 'customers' | 'analytics'>('dashboard');
-const [companies, setCompanies] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'sensors' | 'users' | 'logs' | 'customers' | 'analytics'>('dashboard');
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [sensorLatestData, setSensorLatestData] = useState<{ [key: string]: { temperature: number; humidity: number; timestamp: number } }>({});
 
-const [showSensorModal, setShowSensorModal] = useState(false);
-const [sensorError, setSensorError] = useState('');
-const [newSensor, setNewSensor] = useState({ sensorId: '', name: '', type: 'temperature', companyId: '' });
-const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showSensorModal, setShowSensorModal] = useState(false);
+  const [sensorError, setSensorError] = useState('');
+  const [newSensor, setNewSensor] = useState({ sensorId: '', name: '', type: 'temperature_humidity', companyId: '' });
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
 
 
 
   const user = getUser();
+
+  useEffect(() => {
+    // Update sensor latest data when new sensor data arrives
+    if (sensorData && sensorData.length > 0) {
+      const latestDataMap: { [key: string]: { temperature: number; humidity: number; timestamp: number } } = {};
+      
+      // Get the latest data for each sensor
+      sensorData.forEach(data => {
+        if (!latestDataMap[data.sensor_id] || data.timestamp > latestDataMap[data.sensor_id].timestamp) {
+          latestDataMap[data.sensor_id] = {
+            temperature: data.temperature,
+            humidity: data.humidity,
+            timestamp: data.timestamp
+          };
+        }
+      });
+      
+      setSensorLatestData(latestDataMap);
+    }
+  }, [sensorData]);
 
   useEffect(() => {
   
@@ -110,6 +133,22 @@ const handleAddSensor = async (e: React.FormEvent) => {
   } catch (err: any) {
     setSensorError(err.response?.data?.error || 'Hata oluştu.');
   }
+};
+
+const handleSensorUpdate = (sensorId: string, temperature: number, humidity: number) => {
+  // Update local state immediately
+  setSensorLatestData(prev => ({
+    ...prev,
+    [sensorId]: {
+      temperature,
+      humidity,
+      timestamp: Math.floor(Date.now() / 1000)
+    }
+  }));
+
+  // Simulate sensor data update
+  sensorSimulation.simulateSensorData(sensorId, temperature, humidity);
+  setToast({ message: `${sensorId} sensör verileri güncellendi`, type: 'info' });
 };
 
 
@@ -268,6 +307,82 @@ const handleAddSensor = async (e: React.FormEvent) => {
               <StatCard title="Veri Sayısı" value={sensorData.length} unit="kayıt" color={colors.green} icon="📈" />
             </div>
 
+            {/* Latest Sensor Data */}
+            <div style={{
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
+              borderRadius: '16px',
+              padding: '1.5rem',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontSize: '1rem', fontWeight: 600 }}>Son Sensör Verileri</h2>
+                <span style={{
+                  padding: '0.25rem 0.75rem',
+                  background: colors.greenDim,
+                  color: colors.green,
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 500
+                }}>
+                  CANLI
+                </span>
+              </div>
+              
+              {Object.keys(sensorLatestData).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: colors.textDim }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>📡</div>
+                  Sensör verisi bekleniyor...
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  {Object.entries(sensorLatestData).map(([sensorId, data]) => {
+                    const sensor = sensors.find(s => s.sensorId === sensorId);
+                    return (
+                      <div key={sensorId} style={{
+                        background: 'rgba(239,239,245,0.04)',
+                        border: '1px solid rgba(239,239,245,0.08)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                            {sensor?.name || sensorId}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: colors.textMuted, fontFamily: 'monospace' }}>
+                            {sensorId}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.75rem', color: colors.textMuted, marginBottom: '0.25rem' }}>🌡️ Sıcaklık</div>
+                            <div style={{ fontSize: '1.125rem', fontWeight: 600, color: colors.amber }}>
+                              {data.temperature.toFixed(1)}°C
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.75rem', color: colors.textMuted, marginBottom: '0.25rem' }}>💧 Nem</div>
+                            <div style={{ fontSize: '1.125rem', fontWeight: 600, color: colors.cyan }}>
+                              {data.humidity.toFixed(0)}%
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.75rem', color: colors.textMuted, marginBottom: '0.25rem' }}>Son Güncelleme</div>
+                            <div style={{ fontSize: '0.8125rem', color: colors.textMuted }}>
+                              {new Date(data.timestamp * 1000).toLocaleTimeString('tr-TR')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             {/* Chart */}
             <div style={{
               background: colors.bgCard,
@@ -355,6 +470,25 @@ const handleAddSensor = async (e: React.FormEvent) => {
       </div>
     )}
 
+    {/* System Admin Sensor Controls */}
+    {user?.role === 'system_admin' && sensors.length > 0 && (
+      <div style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', color: colors.text }}>
+          Sensör Kontrol Paneli
+        </h3>
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {sensors.map(sensor => (
+            <SensorControl
+              key={sensor.id}
+              sensor={sensor}
+              onUpdate={handleSensorUpdate}
+              currentData={sensorLatestData[sensor.sensorId]}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
     {/* Tablo */}
     <div style={{
       background: colors.bgCard,
@@ -438,9 +572,9 @@ const handleAddSensor = async (e: React.FormEvent) => {
                 value={newSensor.type}
                 onChange={e => setNewSensor({ ...newSensor, type: e.target.value })}
               >
+                <option value="temperature_humidity">Sıcaklık + Nem</option>
                 <option value="temperature">Sıcaklık</option>
                 <option value="humidity">Nem</option>
-                <option value="temperature_humidity">Sıcaklık + Nem</option>
                 <option value="pressure">Basınç</option>
               </select>
             </div>

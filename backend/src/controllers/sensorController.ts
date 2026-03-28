@@ -4,6 +4,7 @@ import Sensor from '../models/Sensor';
 import UserSensor from '../models/UserSensor';
 import { AuthRequest } from '../middlewares/auth';
 import { UserRole } from '../models/User';
+import mqttPublisher from '../mqtt/publisher';
 
 const influxClient = new InfluxDB({
   url: process.env.INFLUXDB_URL || 'http://localhost:8086',
@@ -102,6 +103,36 @@ export const getUserSensors = async (req: AuthRequest, res: Response): Promise<v
     const sensors = await Sensor.findAll({ where: { id: sensorIds, isActive: true } });
     res.json(sensors);
   } catch (error) {
+    res.status(500).json({ error: 'Sunucu hatası.' });
+  }
+};
+
+export const simulateSensorData = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { sensorId, temperature, humidity } = req.body;
+    
+    // Validate required fields
+    if (!sensorId || typeof temperature !== 'number' || typeof humidity !== 'number') {
+      res.status(400).json({ error: 'Geçersiz sensör verisi.' });
+      return;
+    }
+
+    // Check if sensor exists
+    const sensor = await Sensor.findOne({ where: { sensorId } });
+    if (!sensor) {
+      res.status(404).json({ error: 'Sensör bulunamadı.' });
+      return;
+    }
+
+    // Publish sensor data via MQTT
+    const sensorData = await mqttPublisher.publishSensorDataFromControls(sensorId, temperature, humidity);
+
+    res.json({ 
+      message: 'Sensör verisi başarıyla gönderildi.',
+      data: sensorData 
+    });
+  } catch (error) {
+    console.error('Sensor simulation error:', error);
     res.status(500).json({ error: 'Sunucu hatası.' });
   }
 };
